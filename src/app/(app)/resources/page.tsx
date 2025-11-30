@@ -2,6 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Video, FileText } from "lucide-react";
 import Link from "next/link";
+import { slugify } from "@/lib/utils";
 
 const resourceSections = [
   {
@@ -11,17 +12,14 @@ const resourceSections = [
       {
         title: "Mastering the STAR Method",
         description: "A comprehensive guide to structuring your answers for behavioral questions.",
-        href: "/resources"
       },
       {
         title: "Top 10 Common Interview Mistakes",
         description: "Learn what to avoid to make a great impression.",
-        href: "/resources"
       },
       {
         title: "Body Language for Confidence",
         description: "Tips on posture, eye contact, and gestures.",
-        href: "/resources"
       }
     ]
   },
@@ -32,17 +30,14 @@ const resourceSections = [
       {
         title: "How to Answer 'Tell Me About Yourself'",
         description: "A 5-minute video breaking down the perfect opening.",
-        href: "/resources"
       },
       {
         title: "Salary Negotiation 101",
         description: "Expert advice on navigating the salary conversation.",
-        href: "/resources"
       },
       {
         title: "Whiteboard Coding Interview Practice",
         description: "Watch a senior engineer solve a common problem.",
-        href: "/resources"
       }
     ]
   },
@@ -53,16 +48,20 @@ const resourceSections = [
         {
             title: "How to Tailor Your Resume for Each Job",
             description: "Optimize your resume to get past applicant tracking systems.",
-            href: "/resources"
         },
         {
             title: "Building Your Personal Brand on LinkedIn",
             description: "Strategies to enhance your professional online presence.",
-            href: "/resources"
         }
     ]
   }
-];
+].map(section => ({
+  ...section,
+  resources: section.resources.map(resource => ({
+    ...resource,
+    slug: slugify(resource.title)
+  }))
+}));
 
 export default function ResourcesPage() {
   return (
@@ -86,7 +85,7 @@ export default function ResourcesPage() {
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {section.resources.map((resource) => (
-                  <Link href={resource.href} key={resource.title} className="group block">
+                  <Link href={`/resources/${resource.slug}`} key={resource.title} className="group block">
                     <Card className="h-full hover:bg-secondary/50 transition-colors">
                       <CardHeader>
                         <CardTitle className="text-lg group-hover:text-primary transition-colors">{resource.title}</CardTitle>
