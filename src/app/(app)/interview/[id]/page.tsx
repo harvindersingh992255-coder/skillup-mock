@@ -6,12 +6,14 @@ import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Mic, MicOff, SkipForward, Video, Type, Square } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mic, Send, Square, SkipForward, Video, Type } from "lucide-react";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { generateInterviewQuestions, GenerateInterviewQuestionsOutput } from "@/ai/flows/generate-interview-questions";
+import { Loader2 } from "lucide-react";
 
 // SpeechRecognition might not be available on all browsers, and might have different vendor prefixes.
 const SpeechRecognition =
@@ -27,6 +29,42 @@ export default function InterviewPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
+
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        setIsLoadingQuestions(true);
+        // In a real app, these would come from the practice setup page.
+        const result: GenerateInterviewQuestionsOutput = await generateInterviewQuestions({
+          jobRole: "Software Engineer",
+          industry: "Technology",
+          interviewType: "behavioral",
+          numQuestions: 5,
+          difficultyLevel: 'medium',
+          sessionDuration: 15
+        });
+        setQuestions(result.questions);
+      } catch (error) {
+        console.error("Failed to generate questions:", error);
+        toast({
+          variant: "destructive",
+          title: "Failed to load questions",
+          description: "Could not generate interview questions. Please try again.",
+        });
+        // Fallback to a default question
+        setQuestions(["Tell me about a time you had to handle a difficult stakeholder. How did you manage the situation?"]);
+      } finally {
+        setIsLoadingQuestions(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [toast]);
+
 
   useEffect(() => {
     if (inputType === "video") {
@@ -62,8 +100,6 @@ export default function InterviewPage() {
   
   useEffect(() => {
     if (!SpeechRecognition) {
-      // Silently fail if not supported, the mic button just won't work.
-      // We could show a toast, but it might be annoying.
       return;
     }
 
@@ -94,7 +130,7 @@ export default function InterviewPage() {
     };
     
     recognition.onend = () => {
-        if(isRecording) { // If it stops unexpectedly, restart it.
+        if(isRecording) {
             recognition.start();
         }
     }
@@ -125,7 +161,7 @@ export default function InterviewPage() {
         
        navigator.mediaDevices.getUserMedia({ audio: true })
         .then(() => {
-          setTranscript(""); // Clear previous transcript
+          setTranscript("");
           recognitionRef.current?.start();
           setIsRecording(true);
         })
@@ -140,19 +176,54 @@ export default function InterviewPage() {
     }
   };
 
+  const goToNextQuestion = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setTranscript("");
+      setIsRecording(false);
+      recognitionRef.current?.stop();
+    } else {
+      // End of interview
+      // This should redirect to the results page
+      toast({ title: "Interview complete!", description: "Redirecting to results..."});
+      window.location.href = `/results/${params.id}`;
+    }
+  }
+
+  const goToPreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+       setTranscript("");
+       setIsRecording(false);
+       recognitionRef.current?.stop();
+    }
+  }
+  
+  const hasAnswer = transcript.length > 0;
 
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <p className="text-sm text-muted-foreground">Question 3 of 10</p>
-        <Progress value={30} className="w-full max-w-sm mx-auto mt-2" />
+        {questions.length > 0 && (
+          <>
+            <p className="text-sm text-muted-foreground">Question {currentQuestionIndex + 1} of {questions.length}</p>
+            <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="w-full max-w-sm mx-auto mt-2" />
+          </>
+        )}
       </div>
 
       <Card className="flex-1 flex flex-col">
         <CardHeader className="text-center">
-          <h2 className="text-2xl font-semibold">
-            Tell me about a time you had to handle a difficult stakeholder. How did you manage the situation?
-          </h2>
+          {isLoadingQuestions ? (
+             <div className="flex items-center justify-center gap-2 py-8">
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <p>Generating questions...</p>
+             </div>
+          ) : (
+             <h2 className="text-2xl font-semibold">
+                {questions[currentQuestionIndex]}
+             </h2>
+          )}
         </CardHeader>
         <CardContent className="flex-1 flex flex-col items-center justify-center gap-6">
           <Tabs value={inputType} onValueChange={setInputType} className="w-full max-w-md flex flex-col items-center">
@@ -199,25 +270,34 @@ export default function InterviewPage() {
           </Tabs>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" disabled={isRecording}>
+            <Button variant="ghost" size="icon" disabled={isRecording || currentQuestionIndex === 0} onClick={goToPreviousQuestion}>
               <ChevronLeft className="w-6 h-6" />
             </Button>
-            <Button 
-                size="lg" 
-                className="rounded-full w-20 h-20"
-                onClick={handleMicClick}
-                variant={isRecording ? "destructive" : "default"}
-            >
-              {isRecording ? <Square className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
-            </Button>
-            <Button variant="ghost" size="icon" disabled={isRecording}>
+            
+            {hasAnswer ? (
+                <Button size="lg" className="px-6" onClick={goToNextQuestion}>
+                    Submit Answer <Send className="w-4 h-4 ml-2" />
+                </Button>
+            ) : (
+                <Button 
+                    size="lg" 
+                    className="rounded-full w-20 h-20"
+                    onClick={handleMicClick}
+                    variant={isRecording ? "destructive" : "default"}
+                    disabled={isLoadingQuestions}
+                >
+                  {isRecording ? <Square className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
+                </Button>
+            )}
+
+            <Button variant="ghost" size="icon" disabled={isRecording || currentQuestionIndex === questions.length - 1} onClick={goToNextQuestion}>
               <ChevronRight className="w-6 h-6" />
             </Button>
           </div>
         </CardContent>
       </Card>
       <div className="flex justify-between items-center mt-4">
-        <Button variant="outline" disabled={isRecording}>
+        <Button variant="outline" disabled={isRecording} onClick={goToNextQuestion}>
           <SkipForward className="w-4 h-4 mr-2" />
           Skip Question
         </Button>
