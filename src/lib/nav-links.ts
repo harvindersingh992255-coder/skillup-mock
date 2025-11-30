@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { BarChart, BookOpen, Clock, HelpCircle, Home, LogOut, PlayCircle, Settings, User } from "lucide-react";
+import { BarChart, BookOpen, Clock, CreditCard, HelpCircle, Home, LogOut, PlayCircle, Settings, User, FileText } from "lucide-react";
 
 type NavLink = {
   href: string;
@@ -13,6 +13,7 @@ export const NAV_LINKS: { primary: NavLink[]; secondary: NavLink[] } = {
     { href: "/practice", label: "Practice", icon: PlayCircle },
     { href: "/progress", label: "Progress", icon: BarChart },
     { href: "/resources", label: "Resources", icon: BookOpen },
+    { href: "/pricing", label: "Pricing", icon: CreditCard },
     { href: "/profile", label: "Profile", icon: User },
   ],
   secondary: [
