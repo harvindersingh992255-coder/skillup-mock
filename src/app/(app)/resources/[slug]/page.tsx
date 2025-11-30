@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Video, FileText } from "lucide-react";
 import { slugify } from "@/lib/utils";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -86,7 +86,8 @@ const resourceSections = [
 }));
 
 
-export default function ResourcePage({ params }: { params: { slug: string } }) {
+export default function ResourcePage() {
+  const params = useParams<{ slug: string }>();
   const allResources = resourceSections.flatMap(section => section.resources);
   const resource = allResources.find(r => r.slug === params.slug);
 
