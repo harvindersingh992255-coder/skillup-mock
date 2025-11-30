@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Video, FileText } from "lucide-react";
 import Link from "next/link";
@@ -10,17 +11,17 @@ const resourceSections = [
       {
         title: "Mastering the STAR Method",
         description: "A comprehensive guide to structuring your answers for behavioral questions.",
-        href: "#"
+        href: "/resources"
       },
       {
         title: "Top 10 Common Interview Mistakes",
         description: "Learn what to avoid to make a great impression.",
-        href: "#"
+        href: "/resources"
       },
       {
         title: "Body Language for Confidence",
         description: "Tips on posture, eye contact, and gestures.",
-        href: "#"
+        href: "/resources"
       }
     ]
   },
@@ -31,17 +32,17 @@ const resourceSections = [
       {
         title: "How to Answer 'Tell Me About Yourself'",
         description: "A 5-minute video breaking down the perfect opening.",
-        href: "#"
+        href: "/resources"
       },
       {
         title: "Salary Negotiation 101",
         description: "Expert advice on navigating the salary conversation.",
-        href: "#"
+        href: "/resources"
       },
       {
         title: "Whiteboard Coding Interview Practice",
         description: "Watch a senior engineer solve a common problem.",
-        href: "#"
+        href: "/resources"
       }
     ]
   },
@@ -52,12 +53,12 @@ const resourceSections = [
         {
             title: "How to Tailor Your Resume for Each Job",
             description: "Optimize your resume to get past applicant tracking systems.",
-            href: "#"
+            href: "/resources"
         },
         {
             title: "Building Your Personal Brand on LinkedIn",
             description: "Strategies to enhance your professional online presence.",
-            href: "#"
+            href: "/resources"
         }
     ]
   }
