@@ -14,10 +14,11 @@ export const NAV_LINKS: { primary: NavLink[]; secondary: NavLink[] } = {
     { href: "/progress", label: "Progress", icon: BarChart },
     { href: "/resources", label: "Resources", icon: BookOpen },
     { href: "/pricing", label: "Pricing", icon: CreditCard },
-    { href: "/profile", label: "Profile", icon: User },
   ],
   secondary: [
+    { href: "/profile", label: "Profile", icon: User },
     { href: "/history", label: "Interview History", icon: Clock },
+    { href: "/resume", label: "Resume", icon: FileText },
     { href: "/settings", label: "Settings", icon: Settings },
     { href: "/help", label: "Help & Support", icon: HelpCircle },
     { href: "/login", label: "Logout", icon: LogOut },

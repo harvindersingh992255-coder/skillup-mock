@@ -4,11 +4,11 @@ import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-background">
       <DesktopSidebar />
-      <div className="md:pl-64 flex flex-col flex-1">
+      <div className="flex flex-col md:pl-64">
         <AppHeader />
-        <main className="flex-1 bg-secondary/50 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 p-4 pb-20 sm:p-6 lg:p-8 md:pb-8">
           {children}
         </main>
       </div>
