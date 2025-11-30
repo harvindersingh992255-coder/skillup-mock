@@ -5,17 +5,25 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Mic, SkipForward, Video, Type } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mic, MicOff, SkipForward, Video, Type, Square } from "lucide-react";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 
+// SpeechRecognition might not be available on all browsers, and might have different vendor prefixes.
+const SpeechRecognition =
+  (typeof window !== 'undefined' && (window.SpeechRecognition || (window as any).webkitSpeechRecognition)) || null;
+
+
 export default function InterviewPage({ params }: { params: { id: string } }) {
   const [inputType, setInputType] = useState("video");
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcript, setTranscript] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
+  const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -33,8 +41,8 @@ export default function InterviewPage({ params }: { params: { id: string } }) {
           setHasCameraPermission(false);
           toast({
             variant: 'destructive',
-            title: 'Camera Access Denied',
-            description: 'Please enable camera permissions in your browser settings to use this feature.',
+            title: 'Camera/Mic Access Denied',
+            description: 'Please enable camera and microphone permissions in your browser settings.',
           });
         }
       };
@@ -49,6 +57,87 @@ export default function InterviewPage({ params }: { params: { id: string } }) {
       }
     }
   }, [inputType, toast]);
+  
+  useEffect(() => {
+    if (!SpeechRecognition) {
+      // Silently fail if not supported, the mic button just won't work.
+      // We could show a toast, but it might be annoying.
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event: any) => {
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+         setTranscript(prev => prev ? `${prev} ${finalTranscript}` : finalTranscript);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        toast({
+            variant: 'destructive',
+            title: 'Speech Recognition Error',
+            description: `An error occurred: ${event.error}. Please try again.`,
+        });
+        setIsRecording(false);
+    };
+    
+    recognition.onend = () => {
+        if(isRecording) { // If it stops unexpectedly, restart it.
+            recognition.start();
+        }
+    }
+
+    recognitionRef.current = recognition;
+
+    return () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+        }
+    }
+  }, [toast, isRecording]);
+
+
+  const handleMicClick = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+    } else {
+       if (!SpeechRecognition) {
+            toast({
+                variant: 'destructive',
+                title: 'Browser Not Supported',
+                description: 'Speech-to-text is not supported on this browser.',
+            });
+            return;
+        }
+        
+       navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(() => {
+          setTranscript(""); // Clear previous transcript
+          recognitionRef.current?.start();
+          setIsRecording(true);
+        })
+        .catch(err => {
+            console.error('Error accessing microphone:', err);
+            toast({
+                variant: 'destructive',
+                title: 'Microphone Access Denied',
+                description: 'Please enable microphone permissions in your browser settings.',
+            });
+        });
+    }
+  };
+
 
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto">
@@ -99,31 +188,38 @@ export default function InterviewPage({ params }: { params: { id: string } }) {
             </TabsContent>
             <TabsContent value="text" className="w-full mt-4">
               <Textarea
-                placeholder="Type your answer here..."
+                placeholder="Type your answer here, or use the microphone to transcribe..."
                 className="w-full h-48 text-base"
+                value={transcript}
+                onChange={(e) => setTranscript(e.target.value)}
               />
             </TabsContent>
           </Tabs>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" disabled={isRecording}>
               <ChevronLeft className="w-6 h-6" />
             </Button>
-            <Button size="lg" className="rounded-full w-20 h-20 bg-accent hover:bg-accent/90">
-              <Mic className="w-8 h-8 text-accent-foreground" />
+            <Button 
+                size="lg" 
+                className="rounded-full w-20 h-20"
+                onClick={handleMicClick}
+                variant={isRecording ? "destructive" : "default"}
+            >
+              {isRecording ? <Square className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" disabled={isRecording}>
               <ChevronRight className="w-6 h-6" />
             </Button>
           </div>
         </CardContent>
       </Card>
       <div className="flex justify-between items-center mt-4">
-        <Button variant="outline">
+        <Button variant="outline" disabled={isRecording}>
           <SkipForward className="w-4 h-4 mr-2" />
           Skip Question
         </Button>
-        <Button variant="destructive" asChild>
+        <Button variant="destructive" asChild disabled={isRecording}>
           <Link href={`/results/${params.id}`}>End Interview</Link>
         </Button>
       </div>
