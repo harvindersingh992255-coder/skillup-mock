@@ -33,6 +33,7 @@ export default function InterviewPage() {
   const [questions, setQuestions] = useState<string[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
+  const [answers, setAnswers] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -48,6 +49,7 @@ export default function InterviewPage() {
           sessionDuration: 15
         });
         setQuestions(result.questions);
+        setAnswers(new Array(result.questions.length).fill(""));
       } catch (error) {
         console.error("Failed to generate questions:", error);
         toast({
@@ -56,7 +58,9 @@ export default function InterviewPage() {
           description: "Could not generate interview questions. Please try again.",
         });
         // Fallback to a default question
-        setQuestions(["Tell me about a time you had to handle a difficult stakeholder. How did you manage the situation?"]);
+        const fallbackQuestions = ["Tell me about a time you had to handle a difficult stakeholder. How did you manage the situation?"];
+        setQuestions(fallbackQuestions);
+        setAnswers(new Array(fallbackQuestions.length).fill(""));
       } finally {
         setIsLoadingQuestions(false);
       }
@@ -176,30 +180,53 @@ export default function InterviewPage() {
     }
   };
 
-  const goToNextQuestion = () => {
+  const handleAnswerChange = (text: string) => {
+    setTranscript(text);
+  };
+
+  const submitAndGoToNext = (skipped = false) => {
+    // Save current answer
+    const newAnswers = [...answers];
+    newAnswers[currentQuestionIndex] = skipped ? "SKIPPED" : transcript;
+    setAnswers(newAnswers);
+
+    // Stop any recording
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+    }
+
+    // Move to next question or finish
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
-      setTranscript("");
-      setIsRecording(false);
-      recognitionRef.current?.stop();
+      setTranscript(answers[currentQuestionIndex + 1] || "");
     } else {
       // End of interview
-      // This should redirect to the results page
       toast({ title: "Interview complete!", description: "Redirecting to results..."});
+      // In a real app, you'd probably POST the answers to a server here.
+      // Then redirect.
       window.location.href = `/results/${params.id}`;
     }
-  }
+  };
 
   const goToPreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
+      // Save current answer before moving
+      const newAnswers = [...answers];
+      newAnswers[currentQuestionIndex] = transcript;
+      setAnswers(newAnswers);
+
+      if (isRecording) {
+        recognitionRef.current?.stop();
+        setIsRecording(false);
+      }
+      
       setCurrentQuestionIndex(prev => prev - 1);
-       setTranscript("");
-       setIsRecording(false);
-       recognitionRef.current?.stop();
+      setTranscript(answers[currentQuestionIndex - 1] || "");
     }
   }
   
-  const hasAnswer = transcript.length > 0;
+  const hasAnswer = transcript.trim().length > 0;
 
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto">
@@ -264,7 +291,7 @@ export default function InterviewPage() {
                 placeholder="Type your answer here, or use the microphone to transcribe..."
                 className="w-full h-48 text-base"
                 value={transcript}
-                onChange={(e) => setTranscript(e.target.value)}
+                onChange={(e) => handleAnswerChange(e.target.value)}
               />
             </TabsContent>
           </Tabs>
@@ -274,12 +301,8 @@ export default function InterviewPage() {
               <ChevronLeft className="w-6 h-6" />
             </Button>
             
-            {hasAnswer ? (
-                <Button size="lg" className="px-6" onClick={goToNextQuestion}>
-                    Submit Answer <Send className="w-4 h-4 ml-2" />
-                </Button>
-            ) : (
-                <Button 
+            {!hasAnswer && (
+                 <Button 
                     size="lg" 
                     className="rounded-full w-20 h-20"
                     onClick={handleMicClick}
@@ -290,14 +313,22 @@ export default function InterviewPage() {
                 </Button>
             )}
 
-            <Button variant="ghost" size="icon" disabled={isRecording || currentQuestionIndex === questions.length - 1} onClick={goToNextQuestion}>
+            {hasAnswer && (
+                <Button size="lg" className="px-6" onClick={() => submitAndGoToNext()}>
+                    {currentQuestionIndex === questions.length - 1 ? "Finish Interview" : "Submit Answer"}
+                    <Send className="w-4 h-4 ml-2" />
+                </Button>
+            )}
+
+
+            <Button variant="ghost" size="icon" disabled={isRecording || currentQuestionIndex === questions.length - 1} onClick={() => submitAndGoToNext()}>
               <ChevronRight className="w-6 h-6" />
             </Button>
           </div>
         </CardContent>
       </Card>
       <div className="flex justify-between items-center mt-4">
-        <Button variant="outline" disabled={isRecording} onClick={goToNextQuestion}>
+        <Button variant="outline" disabled={isRecording} onClick={() => submitAndGoToNext(true)}>
           <SkipForward className="w-4 h-4 mr-2" />
           Skip Question
         </Button>
