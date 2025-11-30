@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -17,7 +18,8 @@ const SpeechRecognition =
   (typeof window !== 'undefined' && (window.SpeechRecognition || (window as any).webkitSpeechRecognition)) || null;
 
 
-export default function InterviewPage({ params }: { params: { id: string } }) {
+export default function InterviewPage() {
+  const params = useParams<{ id: string }>();
   const [inputType, setInputType] = useState("video");
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isRecording, setIsRecording] = useState(false);
