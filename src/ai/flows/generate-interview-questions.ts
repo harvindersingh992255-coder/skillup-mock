@@ -10,6 +10,17 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import Handlebars from 'handlebars';
+
+// Define a helper function for Handlebars to create a range of numbers
+Handlebars.registerHelper('range', function(n: number) {
+  const arr = [];
+  for (let i = 1; i <= n; i++) {
+    arr.push(i);
+  }
+  return arr;
+});
+
 
 const GenerateInterviewQuestionsInputSchema = z.object({
   jobRole: z.string().describe('The job role for which interview questions should be generated.'),
@@ -45,21 +56,11 @@ const generateInterviewQuestionsPrompt = ai.definePrompt({
   Session Duration: {{{sessionDuration}}} minutes
   Number of Questions: {{{numQuestions}}}
 
-  Here are the interview questions:
-  {{#each (range numQuestions)}}
-  {{@index}}. {{/each}}`,
+  The output should be a JSON object with a "questions" field containing an array of strings. Do not number the questions in the output.
+  `,
 });
 
-// Define a helper function for Handlebars to create a range of numbers
-Handlebars.registerHelper('range', function(n: number) {
-  const arr = [];
-  for (let i = 1; i <= n; i++) {
-    arr.push(i);
-  }
-  return arr;
-});
 
-import Handlebars from 'handlebars';
 
 const generateInterviewQuestionsFlow = ai.defineFlow(
   {
