@@ -16,15 +16,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-const chartData = [
-  { date: "2024-07-15", score: 65 },
-  { date: "2024-07-16", score: 72 },
-  { date: "2024-07-17", score: 70 },
-  { date: "2024-07-18", score: 78 },
-  { date: "2024-07-19", score: 80 },
-  { date: "2024-07-20", score: 85 },
-  { date: "2024-07-21", score: 82 },
+const chartData: { date: string, score: number }[] = [
 ]
 
 const chartConfig = {
@@ -35,6 +29,16 @@ const chartConfig = {
 }
 
 export function ProgressOverview() {
+  if (chartData.length === 0) {
+    return (
+      <div className="flex h-[250px] w-full items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">No data yet.</p>
+          <p className="text-sm text-muted-foreground">Complete an interview to see your progress.</p>
+        </div>
+      </div>
+    );
+  }
   return (
       <ChartContainer config={chartConfig} className="h-[250px] w-full">
         <BarChart accessibilityLayer data={chartData}>

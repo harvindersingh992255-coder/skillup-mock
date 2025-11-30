@@ -3,19 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowRight, Lightbulb } from "lucide-react";
 import Link from "next/link";
 
-const recommendations = [
-    {
-        title: "Practice STAR Method",
-        description: "Your behavioral answers could be more structured. Try focusing on the STAR method."
-    },
-    {
-        title: "Deepen Technical Explanations",
-        description: "For technical questions, try to explain the 'why' behind your choices."
-    },
-    {
-        title: "Work on Conciseness",
-        description: "Some of your answers were a bit long. Practice being more concise."
-    },
+const recommendations: any[] = [
 ];
 
 export function Recommendations() {
@@ -28,7 +16,12 @@ export function Recommendations() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                {recommendations.map((rec) => (
+                {recommendations.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center text-center py-8">
+                        <p className="text-muted-foreground">No recommendations yet.</p>
+                        <p className="text-sm text-muted-foreground">Complete an interview to get personalized feedback.</p>
+                    </div>
+                ) : recommendations.map((rec) => (
                     <div key={rec.title} className="flex items-start gap-4 p-3 bg-secondary rounded-lg">
                         <div className="bg-primary/10 text-primary p-2 rounded-full">
                             <Lightbulb className="w-5 h-5" />

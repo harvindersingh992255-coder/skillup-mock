@@ -24,7 +24,7 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Welcome Back, Alex!</h1>
+          <h1 className="text-3xl font-bold">Welcome!</h1>
           <p className="text-muted-foreground">
             Here&apos;s your interview performance at a glance.
           </p>
@@ -41,7 +41,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Progress Overview</CardTitle>
             <CardDescription>
-              Your average score over the last 7 sessions.
+              Your average score over your sessions.
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">

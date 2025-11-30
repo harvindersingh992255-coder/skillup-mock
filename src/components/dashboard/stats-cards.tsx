@@ -5,17 +5,17 @@ const stats = [
     {
       icon: <ClipboardCheck className="h-6 w-6 text-muted-foreground" />,
       label: "Sessions Completed",
-      value: "12",
+      value: "0",
     },
     {
       icon: <Star className="h-6 w-6 text-muted-foreground" />,
       label: "Average Score",
-      value: "82%",
+      value: "0%",
     },
     {
       icon: <Flame className="h-6 w-6 text-muted-foreground" />,
       label: "Practice Streak",
-      value: "5 days",
+      value: "0 days",
     },
 ];
 

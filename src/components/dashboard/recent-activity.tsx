@@ -1,26 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
-const activities = [
-    {
-        role: "Software Engineer",
-        score: 82,
-        date: "2 days ago",
-        avatarId: "user-avatar-1"
-    },
-    {
-        role: "Product Manager",
-        score: 75,
-        date: "4 days ago",
-        avatarId: "user-avatar-2"
-    },
-    {
-        role: "UX Designer",
-        score: 90,
-        date: "1 week ago",
-        avatarId: "user-avatar-3"
-    },
+const activities: any[] = [
 ];
 
 export function RecentActivity() {
@@ -33,7 +17,14 @@ export function RecentActivity() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
-                {activities.map((activity, index) => {
+                {activities.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center text-center py-8">
+                        <p className="text-muted-foreground">No recent sessions.</p>
+                        <Button variant="link" asChild>
+                            <Link href="/practice">Start your first interview</Link>
+                        </Button>
+                    </div>
+                ) : activities.map((activity, index) => {
                      const avatar = PlaceHolderImages.find((img) => img.id === activity.avatarId);
                      return (
                         <div key={index} className="flex items-center justify-between">

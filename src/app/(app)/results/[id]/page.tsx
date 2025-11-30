@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Info, Play, Share2, TrendingUp, XCircle } from "lucide-react";
+import Link from "next/link";
 
 function ScoreIndicator({ score }: { score: number }) {
     const circumference = 2 * Math.PI * 45;
@@ -44,13 +45,15 @@ export default function ResultsPage() {
     return (
         <div className="max-w-5xl mx-auto flex flex-col gap-8">
             <div className="flex flex-col items-center text-center gap-4">
-                <ScoreIndicator score={82} />
+                <ScoreIndicator score={0} />
                 <div>
-                    <h1 className="text-3xl font-bold">Great Job, Alex!</h1>
+                    <h1 className="text-3xl font-bold">Interview Complete!</h1>
                     <p className="text-muted-foreground">Here is the breakdown of your interview performance.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button>Retake Interview</Button>
+                    <Button asChild>
+                      <Link href="/practice">Practice Again</Link>
+                    </Button>
                     <Button variant="outline">
                         <Share2 className="w-4 h-4 mr-2"/>
                         Share Results
@@ -64,11 +67,7 @@ export default function ResultsPage() {
                         <CardTitle className="flex items-center gap-2"><CheckCircle className="text-accent"/>Strengths</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ul className="list-disc pl-5 space-y-2 text-sm text-muted-foreground">
-                            <li>Clearly articulated your experience using the STAR method.</li>
-                            <li>Demonstrated strong technical knowledge in key areas.</li>
-                            <li>Maintained good eye contact and confident posture.</li>
-                        </ul>
+                         <p className="text-sm text-muted-foreground">Complete an interview to see your strengths.</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -76,11 +75,7 @@ export default function ResultsPage() {
                         <CardTitle className="flex items-center gap-2"><TrendingUp className="text-primary"/>Areas for Improvement</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ul className="list-disc pl-5 space-y-2 text-sm text-muted-foreground">
-                            <li>Could provide more concise answers to behavioral questions.</li>
-                            <li>Expand on the impact of your projects with specific metrics.</li>
-                            <li>Pace of speech was slightly fast at times.</li>
-                        </ul>
+                        <p className="text-sm text-muted-foreground">Complete an interview to see areas for improvement.</p>
                     </CardContent>
                 </Card>
             </div>
@@ -91,20 +86,9 @@ export default function ResultsPage() {
                     <CardDescription>AI-generated feedback for each of your responses.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div>
-                        <h4 className="font-semibold">Q: Tell me about a time you had to handle a difficult stakeholder.</h4>
-                        <div className="mt-2 p-4 bg-secondary rounded-lg">
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium">Your Answer (Score: 78)</p>
-                                <Button variant="ghost" size="sm"><Play className="w-4 h-4 mr-2"/> Play</Button>
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-2 border-l-2 border-primary pl-3">"Well, there was this one time where my manager's, uh, boss was really unhappy with our project timeline..."</p>
-                            <div className="mt-3 text-sm flex items-start gap-2 text-primary p-3 bg-primary/10 rounded-md">
-                                <Info className="w-4 h-4 mt-1 shrink-0" />
-                                <p><span className="font-semibold">Feedback:</span> Your response structure could be improved. Try to state the situation and task more clearly before jumping into the action and result.</p>
-                            </div>
-                        </div>
-                    </div>
+                   <div className="text-center py-8">
+                        <p className="text-muted-foreground">Your detailed feedback will appear here after your first session.</p>
+                   </div>
                 </CardContent>
             </Card>
         </div>
