@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,6 +40,21 @@ export default function PracticePage() {
                     <SelectItem value="data-scientist">Data Scientist</SelectItem>
                     <SelectItem value="ux-designer">UX Designer</SelectItem>
                     <SelectItem value="marketing-associate">Marketing Associate</SelectItem>
+                    <SelectItem value="devops-engineer">DevOps Engineer</SelectItem>
+                    <SelectItem value="systems-analyst">Systems Analyst</SelectItem>
+                    <SelectItem value="network-administrator">Network Administrator</SelectItem>
+                    <SelectItem value="cybersecurity-analyst">Cybersecurity Analyst</SelectItem>
+                    <SelectItem value="ai-ml-engineer">AI/ML Engineer</SelectItem>
+                    <SelectItem value="business-analyst">Business Analyst</SelectItem>
+                    <SelectItem value="financial-analyst">Financial Analyst</SelectItem>
+                    <SelectItem value="management-consultant">Management Consultant</SelectItem>
+                    <SelectItem value="human-resources-manager">Human Resources Manager</SelectItem>
+                    <SelectItem value="sales-representative">Sales Representative</SelectItem>
+                    <SelectItem value="graphic-designer">Graphic Designer</SelectItem>
+                    <SelectItem value="content-writer">Content Writer</SelectItem>
+                    <SelectItem value="customer-service-representative">Customer Service Representative</SelectItem>
+                    <SelectItem value="project-manager">Project Manager</SelectItem>
+                    <SelectItem value="operations-manager">Operations Manager</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -54,6 +70,16 @@ export default function PracticePage() {
                     <SelectItem value="healthcare">Healthcare</SelectItem>
                     <SelectItem value="retail">Retail</SelectItem>
                     <SelectItem value="consulting">Consulting</SelectItem>
+                    <SelectItem value="e-commerce">E-commerce</SelectItem>
+                    <SelectItem value="education">Education</SelectItem>
+                    <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                    <SelectItem value="real-estate">Real Estate</SelectItem>
+                    <SelectItem value="entertainment">Entertainment</SelectItem>
+                    <SelectItem value="automotive">Automotive</SelectItem>
+                    <SelectItem value="telecommunications">Telecommunications</SelectItem>
+                    <SelectItem value="government">Government</SelectItem>
+                    <SelectItem value="non-profit">Non-profit</SelectItem>
+                    <SelectItem value="transportation-logistics">Transportation & Logistics</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
