@@ -1,0 +1,20 @@
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  const questions = [
+    {
+      id: 1,
+      question: "Tell me about yourself.",
+    },
+    {
+      id: 2,
+      question: "Why should we hire you?",
+    },
+    {
+      id: 3,
+      question: "What are your strengths and weaknesses?",
+    }
+  ];
+
+  return NextResponse.json({ success: true, questions });
+}
